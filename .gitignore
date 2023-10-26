@@ -219,3 +219,4 @@ pip-log.txt
 .mr.developer.cfg
 /.vs/ATools/v15
 /Lib/assimp/.vs/Assimp/v15
+Lib/Assimp/.vs/

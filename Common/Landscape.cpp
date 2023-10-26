@@ -290,6 +290,9 @@ void CLandscape::UpdateTextureLayers()
 		for (j = 0; j < MAP_SIZE * MAP_SIZE; j++)
 			pixels[j] = D3DCOLOR_ARGB(layer->alphaMap[j], m_colorMap[j * 3], m_colorMap[j * 3 + 1], m_colorMap[j * 3 + 2]);
 		layer->lightMap->UnlockRect(0);
+		char filename[256];
+		sprintf(filename, "c:/lnd_%d_%d_layer_%d.png", m_posX / MAP_SIZE, m_posY / MAP_SIZE, i);
+		D3DXSaveTextureToFileA(filename, D3DXIFF_PNG, layer->lightMap, null);
 	}
 }
 

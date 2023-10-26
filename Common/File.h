@@ -46,6 +46,8 @@ public:
 		m_file.write((const char*)val, (qint64)(sizeof(T) * count));
 	}
 
+	const QFile &GetQFile();
+
 private:
 	QIODevice::OpenModeFlag m_mode;
 	QFile m_file;

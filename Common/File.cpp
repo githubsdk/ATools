@@ -86,3 +86,8 @@ const char* CFile::GetBuffer() const
 		return m_buffer.constData();
 	return null;
 }
+
+const QFile& CFile::GetQFile()
+{
+	return m_file;
+}
