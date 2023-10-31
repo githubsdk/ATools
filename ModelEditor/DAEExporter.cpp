@@ -23,6 +23,8 @@ bool CDAEExporter::Export(const string& filename)
 	m_colladaNode.setAttribute("xmlns", "http://www.collada.org/2005/11/COLLADASchema");
 	m_doc.appendChild(m_colladaNode);
 
+	m_file.setFileName(filename);
+
 	_writeAsset();
 	_writeCameras();
 	_writeLights();
@@ -35,11 +37,11 @@ bool CDAEExporter::Export(const string& filename)
 	_writeVisualScenes();
 	_writeScene();
 
-	m_file.setFileName(filename);
 	if (!m_file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return false;
 
 	QTextStream out(&m_file);
+	string n = m_file.fileName();
 	out.setCodec("UTF-8");
 	out << m_doc.toString();
 
@@ -462,7 +464,10 @@ void CDAEExporter::_writeAnimations()
 {
 	QDomElement animations = m_doc.createElement("library_animations");
 	m_colladaNode.appendChild(animations);
-
+	const string fname = m_file.fileName();
+	QStringList strList = fname.split("_");
+	string daeName = strList.last();
+	string animName = daeName.replace(".dae", "");
 	TMAnimation* frames = null;
 	for (auto it = m_animations.begin(); it != m_animations.end(); it++)
 	{
@@ -471,6 +476,7 @@ void CDAEExporter::_writeAnimations()
 
 		QDomElement animation = m_doc.createElement("animation");
 		animation.setAttribute("id", aniID);
+		animation.setAttribute("name", animName);
 		animations.appendChild(animation);
 
 		{
@@ -888,11 +894,11 @@ void CDAEExporter::_writeVisualScenes()
 	visual_scene.setAttribute("name", "Scene");
 	visual_scenes.appendChild(visual_scene);
 
-	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
+	/*for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
 		if (it.value()->parentID == -1)
 			_writeNode(&visual_scene, it.key(), it.value());
-	}
+	}*/
 
 	for (int i = 0; i < m_bones.size(); i++)
 	{

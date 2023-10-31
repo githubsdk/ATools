@@ -598,11 +598,35 @@ void CMainFrame::SaveFile()
 	if (!filename.isEmpty())
 	{
 		QFileInfo fileInfo(filename);
-		ModelMng->SetModelPath(fileInfo.path() % '/');
-		TextureMng->SetModelTexturePath(fileInfo.path() % '/');
+		/*ModelMng->SetModelPath(fileInfo.path() % '/');
+		TextureMng->SetModelTexturePath(fileInfo.path() % '/');*/
 		m_filename = fileInfo.fileName();
 		_saveFile(filename);
 	}
+
+	//AutoSaveFiles();
+}
+
+void CMainFrame::AutoSaveFiles(){
+	int motionCount = m_motionList->stringList().count();
+	for (int motionIndex = 0; motionIndex < motionCount; ++motionIndex){
+		const QString motion = m_motionList->stringList().at(motionIndex);
+		PlayMotion(motion);
+
+		if (!m_mesh)
+			return;
+
+		string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", ".dae");
+
+
+		if (!filename.isEmpty())
+		{
+			QFileInfo fileInfo(filename);
+			m_filename = fileInfo.fileName();
+			_saveFile(filename);
+		}
+	}
+	
 }
 
 void CMainFrame::EditEffects()
@@ -749,12 +773,8 @@ void CMainFrame::MotionAttributeModified(int row, int frame, bool removed)
 	}
 }
 
-void CMainFrame::PlayMotion(const QModelIndex & index)
+void CMainFrame::PlayMotion(const QString & motionName)
 {
-	m_soundMng->Stop();
-	m_modelViewer->ChangeMotion();
-	const QString motion = m_motionList->stringList().at(index.row());
-
 	if (m_mesh)
 	{
 		string filename;
@@ -765,7 +785,7 @@ void CMainFrame::PlayMotion(const QModelIndex & index)
 		else
 			filename = QFileInfo(m_filename).baseName();
 
-		m_motionName = filename % '_' % motion % ".ani";
+		m_motionName = filename % '_' % motionName % ".ani";
 		Delete(m_mesh->m_motion);
 		m_mesh->SetMotion(m_motionName);
 
@@ -795,6 +815,15 @@ void CMainFrame::PlayMotion(const QModelIndex & index)
 		m_modelViewer->SetAutoRefresh(true);
 		ui.actionJouer->setChecked(true);
 	}
+}
+
+void CMainFrame::PlayMotion(const QModelIndex & index)
+{
+	m_soundMng->Stop();
+	m_modelViewer->ChangeMotion();
+	const QString motion = m_motionList->stringList().at(index.row());
+
+	PlayMotion(motion);
 }
 
 void CMainFrame::Play(bool play)

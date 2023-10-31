@@ -37,6 +37,7 @@ public slots:
 	void CloseFile();
 	void LoadTextureEx();
 	void PlayMotion(const QModelIndex & index);
+	void PlayMotion(const QString & motionName);
 	void Play(bool play);
 	void Stop();
 	void MotionAttributeModified(int row, int frame, bool removed);
@@ -57,6 +58,7 @@ public slots:
 	void SetScaleFactor();
 	void SetReferenceModel();
 	void CollisionAuto();
+	void AutoSaveFiles();
 
 private:
 	Ui::MainFrameClass ui;
