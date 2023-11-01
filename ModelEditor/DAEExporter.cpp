@@ -86,13 +86,13 @@ void CDAEExporter::_writeImages()
 		texture.setAttribute("id", texId);
 		texture.setAttribute("name", texId);
 		QDomElement init_from = m_doc.createElement("init_from");
-		string modelFolder = "Model";
+		/*string modelFolder = "Model";
 		int lastIndex = m_file.fileName().lastIndexOf(modelFolder);
 		int length = m_file.fileName().length() - lastIndex + 1;
 		string filepath = m_file.fileName().remove(lastIndex + modelFolder.length() + 1, length);
 		string texturePath = filepath % "Texture/" %it.value()->textureName;
-		QByteArray qba = texturePath.toLatin1();
-		init_from.appendChild(m_doc.createTextNode(qba.data()));
+		QByteArray qba = texturePath.toLatin1();*/
+		init_from.appendChild(m_doc.createTextNode(it.value()->textureName);
 		texture.appendChild(init_from);
 		images.appendChild(texture);
 	}
@@ -899,11 +899,11 @@ void CDAEExporter::_writeVisualScenes()
 	visual_scene.setAttribute("name", "Scene");
 	visual_scenes.appendChild(visual_scene);
 
-	/*for (auto it = m_objects.begin(); it != m_objects.end(); it++)
+	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
 		if (it.value()->parentID == -1)
 			_writeNode(&visual_scene, it.key(), it.value());
-	}*/
+	}
 
 	for (int i = 0; i < m_bones.size(); i++)
 	{
