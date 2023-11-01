@@ -23,17 +23,17 @@
 #include <ShortcutsMng.h>
 
 CMainFrame::CMainFrame(QWidget *parent)
-	: QMainWindow(parent),
-	m_mesh(null),
-	m_motionList(null),
-	m_timeline(null),
-	m_language(LANG_FRE),
-	m_languageActionGroup(null),
-	m_soundMng(null),
-	m_fillModeActionGroup(null),
-	m_importScaleFactor(1.0f),
-	m_referenceModelID(SEX_SEXLESS),
-	m_status(null)
+: QMainWindow(parent),
+m_mesh(null),
+m_motionList(null),
+m_timeline(null),
+m_language(LANG_FRE),
+m_languageActionGroup(null),
+m_soundMng(null),
+m_fillModeActionGroup(null),
+m_importScaleFactor(1.0f),
+m_referenceModelID(SEX_SEXLESS),
+m_status(null)
 {
 }
 
@@ -565,10 +565,10 @@ void CMainFrame::OpenFile()
 	string dir = ModelMng->GetModelPath();
 	if (!m_filename.isEmpty())
 	{
-		 string tempFilename = m_filename;
-		 if (GetExtension(tempFilename) == "ani")
-			 tempFilename.replace(".ani", ".dae");
-		 dir += tempFilename;
+		string tempFilename = m_filename;
+		if (GetExtension(tempFilename) == "ani")
+			tempFilename.replace(".ani", ".dae");
+		dir += tempFilename;
 	}
 
 	const QString filename = QFileDialog::getOpenFileName(this, tr("Charger un model"), dir, tr("Fichier 3D") % " (" % m_supportedImportFiles % ")");
@@ -604,29 +604,69 @@ void CMainFrame::SaveFile()
 		_saveFile(filename);
 	}
 
-	//AutoSaveFiles();
+	//AutoSaveFiles(2);
 }
 
-void CMainFrame::AutoSaveFiles(){
-	int motionCount = m_motionList->stringList().count();
-	for (int motionIndex = 0; motionIndex < motionCount; ++motionIndex){
-		const QString motion = m_motionList->stringList().at(motionIndex);
-		PlayMotion(motion);
+void CMainFrame::AutoSaveFiles(int saveType){
+	switch (saveType)
+	{
+	case 1:
+	{
+			  //自动保存所有动作
+			  int motionCount = m_motionList->stringList().count();
+			  for (int motionIndex = 0; motionIndex < motionCount; ++motionIndex){
+				  const QString motion = m_motionList->stringList().at(motionIndex);
+				  PlayMotion(motion);
 
-		if (!m_mesh)
-			return;
+				  if (!m_mesh)
+					  return;
 
-		string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", ".dae");
-
-
-		if (!filename.isEmpty())
-		{
-			QFileInfo fileInfo(filename);
-			m_filename = fileInfo.fileName();
-			_saveFile(filename);
-		}
+				  string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", ".dae");
+				  QFileInfo fileInfo(filename);
+				  m_filename = fileInfo.fileName();
+				  _saveFile(filename);
+			  }
 	}
-	
+
+		break;
+	case 2:
+	{
+			  //自动保存所有角色身体部件
+			  string dir = QFileInfo(ModelMng->GetModelPath()).path() % '/';
+			  string filenameToLower;
+			  QStringList list;
+			  const QDir fileDir(dir);
+			  const QStringList files = fileDir.entryList(QDir::Files, QDir::Name);
+
+			  for (int i = 0; i < files.size(); i++)
+			  {
+				  const QString name = files[i].toLower();
+
+				  if ((name.startsWith("part_f") || name.startsWith("part_m")) && name.endsWith("o3d"))
+				  {
+					  list.push_back(files[i].left(files[i].size()));
+				  }
+			  }
+
+			  for (int i = 0; i < list.size(); ++i){
+				  string partFileName = list[i];
+				  //先清理
+				  for (int p = 0; p < MAX_ANIMATED_ELEMENTS; p++){
+					  Delete(m_mesh->m_elements[p].obj);
+				  }
+				  OpenFile(dir + partFileName);
+
+				  string filename = dir % "/PartDAE/" % partFileName.replace(".o3d", ".dae");
+				  QFileInfo fileInfo(filename);
+				  m_filename = fileInfo.fileName();
+				  _saveFile(filename);
+			  }
+	}
+
+		break;
+	default:
+		break;
+	}
 }
 
 void CMainFrame::EditEffects()

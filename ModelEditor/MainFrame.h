@@ -58,7 +58,7 @@ public slots:
 	void SetScaleFactor();
 	void SetReferenceModel();
 	void CollisionAuto();
-	void AutoSaveFiles();
+	void AutoSaveFiles(int saveType);
 
 private:
 	Ui::MainFrameClass ui;
