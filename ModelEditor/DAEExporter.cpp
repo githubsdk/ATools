@@ -92,7 +92,7 @@ void CDAEExporter::_writeImages()
 		string filepath = m_file.fileName().remove(lastIndex + modelFolder.length() + 1, length);
 		string texturePath = filepath % "Texture/" %it.value()->textureName;
 		QByteArray qba = texturePath.toLatin1();*/
-		init_from.appendChild(m_doc.createTextNode(it.value()->textureName);
+		init_from.appendChild(m_doc.createTextNode(it.value()->textureName));
 		texture.appendChild(init_from);
 		images.appendChild(texture);
 	}
