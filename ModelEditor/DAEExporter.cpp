@@ -41,7 +41,6 @@ bool CDAEExporter::Export(const string& filename)
 		return false;
 
 	QTextStream out(&m_file);
-	string n = m_file.fileName();
 	out.setCodec("UTF-8");
 	out << m_doc.toString();
 
@@ -87,7 +86,13 @@ void CDAEExporter::_writeImages()
 		texture.setAttribute("id", texId);
 		texture.setAttribute("name", texId);
 		QDomElement init_from = m_doc.createElement("init_from");
-		init_from.appendChild(m_doc.createTextNode(it.value()->textureName));
+		string modelFolder = "Model";
+		int lastIndex = m_file.fileName().lastIndexOf(modelFolder);
+		int length = m_file.fileName().length() - lastIndex + 1;
+		string filepath = m_file.fileName().remove(lastIndex + modelFolder.length() + 1, length);
+		string texturePath = filepath % "Texture/" %it.value()->textureName;
+		QByteArray qba = texturePath.toLatin1();
+		init_from.appendChild(m_doc.createTextNode(qba.data()));
 		texture.appendChild(init_from);
 		images.appendChild(texture);
 	}
