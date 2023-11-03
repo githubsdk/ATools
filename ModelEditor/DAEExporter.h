@@ -13,6 +13,7 @@ class CDAEExporter : public CExporter
 {
 public:
 	CDAEExporter(CAnimatedMesh* mesh);
+	CDAEExporter(CAnimatedMesh* mesh, bool skipMesh);
 
 	virtual bool Export(const string& filename);
 
@@ -26,6 +27,7 @@ private:
 	QFile m_file;
 	QDomDocument m_doc;
 	QDomElement m_colladaNode;
+	bool m_bSkipMesh;
 
 	void _writeAsset();
 	void _writeCameras();

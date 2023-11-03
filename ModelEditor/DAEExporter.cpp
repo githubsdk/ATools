@@ -14,6 +14,12 @@ CDAEExporter::CDAEExporter(CAnimatedMesh* mesh)
 {
 }
 
+CDAEExporter::CDAEExporter(CAnimatedMesh* mesh, bool skipMesh)
+: CExporter(mesh)
+{
+	m_bSkipMesh = skipMesh;
+}
+
 bool CDAEExporter::Export(const string& filename)
 {
 	m_doc.appendChild(m_doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\""));
@@ -24,13 +30,14 @@ bool CDAEExporter::Export(const string& filename)
 	m_doc.appendChild(m_colladaNode);
 
 	m_file.setFileName(filename);
-
-	_writeAsset();
-	_writeCameras();
-	_writeLights();
-	_writeImages();
-	_writeEffects();
-	_writeMaterials();
+	
+		_writeAsset();
+		_writeCameras();
+		_writeLights();
+		_writeImages();
+		_writeEffects();
+		_writeMaterials();
+	
 	_writeGeometries();
 	_writeAnimations();
 	_writeControllers();
@@ -49,6 +56,8 @@ bool CDAEExporter::Export(const string& filename)
 
 void CDAEExporter::_writeAsset()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement asset = m_doc.createElement("asset");
 	m_colladaNode.appendChild(asset);
 
@@ -64,18 +73,24 @@ void CDAEExporter::_writeAsset()
 
 void CDAEExporter::_writeCameras()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement cameras = m_doc.createElement("library_cameras");
 	m_colladaNode.appendChild(cameras);
 }
 
 void CDAEExporter::_writeLights()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement lights = m_doc.createElement("library_lights");
 	m_colladaNode.appendChild(lights);
 }
 
 void CDAEExporter::_writeImages()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement images = m_doc.createElement("library_images");
 	m_colladaNode.appendChild(images);
 
@@ -100,6 +115,8 @@ void CDAEExporter::_writeImages()
 
 void CDAEExporter::_writeEffects()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement effects = m_doc.createElement("library_effects");
 	m_colladaNode.appendChild(effects);
 
@@ -224,6 +241,8 @@ void CDAEExporter::_writeEffects()
 
 void CDAEExporter::_writeMaterials()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement materials = m_doc.createElement("library_materials");
 	m_colladaNode.appendChild(materials);
 
@@ -241,6 +260,8 @@ void CDAEExporter::_writeMaterials()
 
 void CDAEExporter::_writeGeometries()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement geomerties = m_doc.createElement("library_geometries");
 
 	GMObject* obj;
@@ -624,6 +645,8 @@ void CDAEExporter::_writeAnimations()
 
 void CDAEExporter::_writeControllers()
 {
+	if (m_bSkipMesh)
+		return;
 	QDomElement controllers = m_doc.createElement("library_controllers");
 	m_colladaNode.appendChild(controllers);
 
@@ -899,11 +922,14 @@ void CDAEExporter::_writeVisualScenes()
 	visual_scene.setAttribute("name", "Scene");
 	visual_scenes.appendChild(visual_scene);
 
-	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
-	{
-		if (it.value()->parentID == -1)
-			_writeNode(&visual_scene, it.key(), it.value());
+	if (m_bSkipMesh == false){
+		for (auto it = m_objects.begin(); it != m_objects.end(); it++)
+		{
+			if (it.value()->parentID == -1)
+				_writeNode(&visual_scene, it.key(), it.value());
+		}
 	}
+	
 
 	for (int i = 0; i < m_bones.size(); i++)
 	{
@@ -967,14 +993,16 @@ void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject*
 
 	node.appendChild(instance_geometry);
 
-	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
-	{
-		if (it.value()->parentID == m_objectIDs[obj]
-			&& m_objectLODs[it.value()] == m_objectLODs[obj]
-			&& it.value()->parentType != GMT_BONE)
-			_writeNode(&node, it.key(), it.value());
+	if (m_bSkipMesh == false){
+		for (auto it = m_objects.begin(); it != m_objects.end(); it++)
+		{
+			if (it.value()->parentID == m_objectIDs[obj]
+				&& m_objectLODs[it.value()] == m_objectLODs[obj]
+				&& it.value()->parentType != GMT_BONE)
+				_writeNode(&node, it.key(), it.value());
+		}
 	}
-
+	
 	parent->appendChild(node);
 }
 

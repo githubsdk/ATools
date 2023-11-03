@@ -510,7 +510,7 @@ void CMainFrame::OpenFile(const string& filename)
 	m_status->setText(tr("Prêt"));
 }
 
-void CMainFrame::_saveFile(const string& filename)
+void CMainFrame::_saveFile(const string& filename, bool skipMesh)
 {
 	if (!m_mesh)
 		return;
@@ -518,7 +518,7 @@ void CMainFrame::_saveFile(const string& filename)
 	bool result = false;
 	if (GetExtension(filename) == "dae")
 	{
-		result = CDAEExporter(m_mesh).Export(filename);
+		result = CDAEExporter(m_mesh, skipMesh).Export(filename);
 	}
 	else if (GetExtension(filename) == "obj")
 	{
@@ -604,7 +604,7 @@ void CMainFrame::SaveFile()
 		_saveFile(filename);
 	}
 
-	//AutoSaveFiles(2);
+	AutoSaveFiles(1);
 }
 
 void CMainFrame::AutoSaveFiles(int saveType){
@@ -620,11 +620,11 @@ void CMainFrame::AutoSaveFiles(int saveType){
 
 				  if (!m_mesh)
 					  return;
-
-				  string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", ".dae");
+				  string daeName = "@" % motion % ".dae";
+				  string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", daeName);
 				  QFileInfo fileInfo(filename);
 				  m_filename = fileInfo.fileName();
-				  _saveFile(filename);
+				  _saveFile(filename, true);
 			  }
 	}
 

@@ -83,7 +83,7 @@ private:
 	int m_language;
 	QActionGroup* m_languageActionGroup;
 
-	void _saveFile(const string& filename);
+	void _saveFile(const string& filename, bool skipMesh = false);
 
 	void _connectWidgets();
 	void _loadSettings();
