@@ -56,8 +56,6 @@ bool CDAEExporter::Export(const string& filename)
 
 void CDAEExporter::_writeAsset()
 {
-	if (m_bSkipMesh)
-		return;
 	QDomElement asset = m_doc.createElement("asset");
 	m_colladaNode.appendChild(asset);
 
