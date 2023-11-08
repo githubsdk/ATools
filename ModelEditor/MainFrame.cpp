@@ -14,7 +14,6 @@
 #include <Motion.h>
 #include <Object3D.h>
 #include "Importer.h"
-#include "DAEExporter.h"
 #include "OBJExporter.h"
 #include "DialogEditEffects.h"
 #include <SoundMng.h>
@@ -510,7 +509,7 @@ void CMainFrame::OpenFile(const string& filename)
 	m_status->setText(tr("Prêt"));
 }
 
-void CMainFrame::_saveFile(const string& filename, bool skipMesh)
+void CMainFrame::_saveFile(const string& filename, EExportType exportType)
 {
 	if (!m_mesh)
 		return;
@@ -518,7 +517,7 @@ void CMainFrame::_saveFile(const string& filename, bool skipMesh)
 	bool result = false;
 	if (GetExtension(filename) == "dae")
 	{
-		result = CDAEExporter(m_mesh, skipMesh).Export(filename);
+		result = CDAEExporter(m_mesh, exportType).Export(filename);
 	}
 	else if (GetExtension(filename) == "obj")
 	{
@@ -604,13 +603,13 @@ void CMainFrame::SaveFile()
 		_saveFile(filename);
 	}
 
-	AutoSaveFiles(1);
+	AutoSaveFiles(ExpMesh);
 }
 
-void CMainFrame::AutoSaveFiles(int saveType){
-	switch (saveType)
+void CMainFrame::AutoSaveFiles(EExportType exportType){
+	switch (exportType)
 	{
-	case 1:
+	case ExpAnim:
 	{
 			  //自动保存所有动作
 			  int motionCount = m_motionList->stringList().count();
@@ -624,12 +623,12 @@ void CMainFrame::AutoSaveFiles(int saveType){
 				  string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", daeName);
 				  QFileInfo fileInfo(filename);
 				  m_filename = fileInfo.fileName();
-				  _saveFile(filename, true);
+				  _saveFile(filename, exportType);
 			  }
 	}
 
 		break;
-	case 2:
+	case ExpMesh:
 	{
 			  //自动保存所有角色身体部件
 			  string dir = QFileInfo(ModelMng->GetModelPath()).path() % '/';
@@ -659,7 +658,7 @@ void CMainFrame::AutoSaveFiles(int saveType){
 				  string filename = dir % "/PartDAE/" % partFileName.replace(".o3d", ".dae");
 				  QFileInfo fileInfo(filename);
 				  m_filename = fileInfo.fileName();
-				  _saveFile(filename);
+				  _saveFile(filename, ExpMesh);
 			  }
 	}
 

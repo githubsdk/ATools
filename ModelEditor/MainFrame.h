@@ -9,6 +9,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_MainFrame.h"
+#include "DAEExporter.h"
 
 class CModelViewer;
 class CAnimatedMesh;
@@ -58,9 +59,10 @@ public slots:
 	void SetScaleFactor();
 	void SetReferenceModel();
 	void CollisionAuto();
-	void AutoSaveFiles(int saveType);
+	
 
 private:
+	
 	Ui::MainFrameClass ui;
 	CModelViewer* m_modelViewer;
 	QLabel* m_status;
@@ -83,12 +85,12 @@ private:
 	int m_language;
 	QActionGroup* m_languageActionGroup;
 
-	void _saveFile(const string& filename, bool skipMesh = false);
+	void _saveFile(const string& filename, EExportType exportType = ExpAll);
 
 	void _connectWidgets();
 	void _loadSettings();
 	void _setShortcuts();
-
+	void AutoSaveFiles(EExportType exportType);
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent* event);
 	virtual void dragLeaveEvent(QDragLeaveEvent* event);

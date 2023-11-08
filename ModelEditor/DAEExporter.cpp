@@ -10,14 +10,14 @@
 #include <Motion.h>
 
 CDAEExporter::CDAEExporter(CAnimatedMesh* mesh)
-	: CExporter(mesh)
+: CExporter(mesh)
 {
 }
 
-CDAEExporter::CDAEExporter(CAnimatedMesh* mesh, bool skipMesh)
+CDAEExporter::CDAEExporter(CAnimatedMesh* mesh, EExportType exportType)
 : CExporter(mesh)
 {
-	m_bSkipMesh = skipMesh;
+	m_exportType = exportType;
 }
 
 bool CDAEExporter::Export(const string& filename)
@@ -30,14 +30,14 @@ bool CDAEExporter::Export(const string& filename)
 	m_doc.appendChild(m_colladaNode);
 
 	m_file.setFileName(filename);
-	
-		_writeAsset();
-		_writeCameras();
-		_writeLights();
-		_writeImages();
-		_writeEffects();
-		_writeMaterials();
-	
+
+	_writeAsset();
+	_writeCameras();
+	_writeLights();
+	_writeImages();
+	_writeEffects();
+	_writeMaterials();
+
 	_writeGeometries();
 	_writeAnimations();
 	_writeControllers();
@@ -71,7 +71,7 @@ void CDAEExporter::_writeAsset()
 
 void CDAEExporter::_writeCameras()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement cameras = m_doc.createElement("library_cameras");
 	m_colladaNode.appendChild(cameras);
@@ -79,7 +79,7 @@ void CDAEExporter::_writeCameras()
 
 void CDAEExporter::_writeLights()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement lights = m_doc.createElement("library_lights");
 	m_colladaNode.appendChild(lights);
@@ -87,7 +87,7 @@ void CDAEExporter::_writeLights()
 
 void CDAEExporter::_writeImages()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement images = m_doc.createElement("library_images");
 	m_colladaNode.appendChild(images);
@@ -113,7 +113,7 @@ void CDAEExporter::_writeImages()
 
 void CDAEExporter::_writeEffects()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement effects = m_doc.createElement("library_effects");
 	m_colladaNode.appendChild(effects);
@@ -239,7 +239,7 @@ void CDAEExporter::_writeEffects()
 
 void CDAEExporter::_writeMaterials()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement materials = m_doc.createElement("library_materials");
 	m_colladaNode.appendChild(materials);
@@ -258,7 +258,7 @@ void CDAEExporter::_writeMaterials()
 
 void CDAEExporter::_writeGeometries()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement geomerties = m_doc.createElement("library_geometries");
 
@@ -486,6 +486,8 @@ void CDAEExporter::_writeGeometries()
 
 void CDAEExporter::_writeAnimations()
 {
+	if (ExpMesh == m_exportType)
+		return;
 	QDomElement animations = m_doc.createElement("library_animations");
 	m_colladaNode.appendChild(animations);
 	const string fname = m_file.fileName();
@@ -643,7 +645,7 @@ void CDAEExporter::_writeAnimations()
 
 void CDAEExporter::_writeControllers()
 {
-	if (m_bSkipMesh)
+	if (m_exportType == ExpAnim)
 		return;
 	QDomElement controllers = m_doc.createElement("library_controllers");
 	m_colladaNode.appendChild(controllers);
@@ -920,14 +922,14 @@ void CDAEExporter::_writeVisualScenes()
 	visual_scene.setAttribute("name", "Scene");
 	visual_scenes.appendChild(visual_scene);
 
-	if (m_bSkipMesh == false){
+	if (m_exportType != ExpAnim){
 		for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 		{
 			if (it.value()->parentID == -1)
 				_writeNode(&visual_scene, it.key(), it.value());
 		}
 	}
-	
+
 
 	for (int i = 0; i < m_bones.size(); i++)
 	{
@@ -991,7 +993,7 @@ void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject*
 
 	node.appendChild(instance_geometry);
 
-	if (m_bSkipMesh == false){
+	if (m_exportType == ExpAll){
 		for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 		{
 			if (it.value()->parentID == m_objectIDs[obj]
@@ -1000,7 +1002,7 @@ void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject*
 				_writeNode(&node, it.key(), it.value());
 		}
 	}
-	
+
 	parent->appendChild(node);
 }
 
