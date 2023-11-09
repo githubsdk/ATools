@@ -94,6 +94,8 @@ void CDAEExporter::_writeImages()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
+		if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+			continue;
 		const string texId = string(it.value()->textureName).toLower().replace('.', '_').replace('-', '_').replace(' ', '_') % '-' % it.key();
 		QDomElement texture = m_doc.createElement("image");
 		texture.setAttribute("id", texId);
@@ -120,6 +122,9 @@ void CDAEExporter::_writeEffects()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
+		if (m_exportType == ExpMesh &&  it.key().contains("LOD"))
+			continue;
+
 		const string texID = string(it.value()->textureName).toLower().replace('.', '_').replace('-', '_').replace(' ', '_') % '-' % it.key();
 
 		QDomElement effect = m_doc.createElement("effect");
@@ -246,6 +251,8 @@ void CDAEExporter::_writeMaterials()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
+		if (m_exportType == ExpMesh &&  it.key().contains("LOD"))
+			continue;
 		QDomElement material = m_doc.createElement("material");
 		material.setAttribute("id", it.key() % "-material");
 		material.setAttribute("name", it.key());
@@ -265,6 +272,8 @@ void CDAEExporter::_writeGeometries()
 	GMObject* obj;
 	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
+		if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+			continue;
 		obj = it.value();
 		const QString meshID = it.key() % "-mesh";
 
@@ -653,10 +662,12 @@ void CDAEExporter::_writeControllers()
 	GMObject* obj;
 	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
+		if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+			continue;
 		obj = it.value();
 		if (obj->type != GMT_SKIN)
 			continue;
-
+		
 		SkinVertex* vertices = (SkinVertex*)obj->vertices;
 		const int vertexCount = obj->vertexCount;
 
@@ -940,6 +951,8 @@ void CDAEExporter::_writeVisualScenes()
 
 void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject* obj)
 {
+	if (m_exportType == ExpMesh&&name.contains("LOD"))
+		return;
 	QDomElement node = m_doc.createElement("node");
 	node.setAttribute("id", name);
 	node.setAttribute("name", name);
@@ -1008,6 +1021,8 @@ void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject*
 
 void CDAEExporter::_writeNode(QDomElement* parent, const string& name, Bone* bone)
 {
+	if (m_exportType == ExpMesh&&name.contains("LOD"))
+		return;
 	QDomElement node = m_doc.createElement("node");
 	node.setAttribute("id", name);
 	node.setAttribute("name", name);

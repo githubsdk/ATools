@@ -659,6 +659,7 @@ void CMainFrame::AutoSaveFiles(EExportType exportType){
 				  QFileInfo fileInfo(filename);
 				  m_filename = fileInfo.fileName();
 				  _saveFile(filename, ExpMesh);
+				  //break;
 			  }
 	}
 

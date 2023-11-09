@@ -30,7 +30,6 @@ bones:dict= {'bip02_ponytail12':    'Bip02 Ponytail12',
              'bip02_spine':         'Bip02 Spine',
              'bip02_pelvis':        'Bip02 Pelvis',
              'bip02':               'Bip02'
-
              }
 
 def read_files_with_suffix(directory, suffix):
@@ -41,7 +40,7 @@ def read_files_with_suffix(directory, suffix):
                 files.append(os.path.join(root, filename))
     return files
 
-directory = "D:/Github/feifei/FlyffVS2019/Tools/ATools v1_2/Model/PartDAE/Fbx_txt/"  # 请替换为实际目录路径
+directory = "D:/HHGames/flyff-client/MMO/Assets/AssetsPackage/Art/FFExport/part_dae2fbx"  # 请替换为实际目录路径
 # directory = 'D:/HHGames/flyff-client/MMO/Assets/AssetsPackage/Art/Character/Parts_mCloBaseball01'
 suffix = ".fbx"  # 请替换为实际文件后缀名
 result = read_files_with_suffix(directory, suffix)
@@ -52,6 +51,8 @@ for file_path in result:
         content = f.read();
     for key, value in bones.items():
         content = content.replace(key, value)
+    content = content.replace(".dds", ".png")
+    content = content.replace("..\\", "..\\Texture\\")
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(content)
         
