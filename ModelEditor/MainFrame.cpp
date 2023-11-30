@@ -600,67 +600,131 @@ void CMainFrame::SaveFile()
 		/*ModelMng->SetModelPath(fileInfo.path() % '/');
 		TextureMng->SetModelTexturePath(fileInfo.path() % '/');*/
 		m_filename = fileInfo.fileName();
-		_saveFile(filename);
-	}
+		//_saveFile(filename);
 
-	AutoSaveFiles(ExpMesh);
+		string dir = ModelMng->GetModelPath();
+		SaveMvr(dir, fileInfo.fileName());
+		return;
+	}
+	if (SEX_SEXLESS == m_meshSex){
+		AutoSaveMvr();
+	}
+	else{
+		AutoSaveFiles(ExpAnim);
+	}
 }
 
-void CMainFrame::AutoSaveFiles(EExportType exportType){
+void CMainFrame::SaveMvr(string& dir, string& mvrName){
+	
+	string fileNameWithoutExt = mvrName.split(".")[0];
+	string filename = dir % "AutoSave/Mvr/ModelDAE/" % fileNameWithoutExt % ".dae";
+	QFileInfo fileInfo(filename);
+	m_filename = fileInfo.fileName();
+	_saveFile(filename, ExpMesh);
+	AutoSaveFiles(ExpAnim, fileNameWithoutExt);
+}
+
+void CMainFrame::AutoSaveMvr(){
+	//自动保存所有角色身体部件
+	string dir = ModelMng->GetModelPath();
+	string filenameToLower;
+	QStringList list;
+	const QDir fileDir(dir);
+	const QStringList files = fileDir.entryList(QDir::Files, QDir::Name);
+
+	for (int i = 0; i < files.size(); i++)
+	{
+		const QString name = files[i].toLower();
+
+		if (name.startsWith("mvr_") && (!name.startsWith("mvr_male") || !name.startsWith("mvr_female")) && name.endsWith("o3d"))
+		{
+			list.push_back(files[i].left(files[i].size()));
+		}
+	}
+
+	for (int i = 0; i < list.size(); ++i){
+		string mvrFileName = list[i];
+		OpenFile(dir + mvrFileName);
+		SaveMvr(dir, mvrFileName);
+		//break;
+		/*string filename = dir % "/PartDAE/" % partFileName.replace(".o3d", ".dae");
+		QFileInfo fileInfo(filename);
+		m_filename = fileInfo.fileName();
+		_saveFile(filename, ExpMesh);*/
+		//break;
+	}
+}
+
+void CMainFrame::AutoSaveFiles(EExportType exportType, string fileNameWithoutExt){
 	switch (exportType)
 	{
 	case ExpAnim:
 	{
-			  //自动保存所有动作
-			  int motionCount = m_motionList->stringList().count();
-			  for (int motionIndex = 0; motionIndex < motionCount; ++motionIndex){
-				  const QString motion = m_motionList->stringList().at(motionIndex);
-				  PlayMotion(motion);
+					//自动保存所有动作
+					int motionCount = m_motionList->stringList().count();
+					for (int motionIndex = 0; motionIndex < motionCount; ++motionIndex){
+						const QString motion = m_motionList->stringList().at(motionIndex);
+						PlayMotion(motion);
 
-				  if (!m_mesh)
-					  return;
-				  string daeName = "@" % motion % ".dae";
-				  string filename = ModelMng->GetModelPath() % "/DAE/" % m_motionName.replace(".ani", daeName);
-				  QFileInfo fileInfo(filename);
-				  m_filename = fileInfo.fileName();
-				  _saveFile(filename, exportType);
-			  }
+						if (!m_mesh)
+							return;
+						if (SEX_SEXLESS == m_meshSex){
+							//mvr是不一样的，需要分开写
+							string daeName = fileNameWithoutExt % "@" % motion % ".dae";
+							if (fileNameWithoutExt == "Mvr_InfoPeng" && motion == "Getup"){
+								//这个动作会报错，做的也不对
+								continue;
+							}
+							string filename = ModelMng->GetModelPath() % "AutoSave/Mvr/MotionDAE/" % daeName;
+							QFileInfo fileInfo(filename);
+							_saveFile(filename, exportType);
+						}
+						else{
+							//角色部件，逻辑和mvr是不一样的，需要分开写
+							string daeName = "@" % motion % ".dae";
+							string filename = ModelMng->GetModelPath() % "AutoSave/Player/MotionDAE/" % m_motionName.replace(".ani", daeName);
+							QFileInfo fileInfo(filename);
+							m_filename = fileInfo.fileName();
+							_saveFile(filename, exportType);
+						}
+						
+					}
 	}
 
 		break;
 	case ExpMesh:
 	{
-			  //自动保存所有角色身体部件
-			  string dir = QFileInfo(ModelMng->GetModelPath()).path() % '/';
-			  string filenameToLower;
-			  QStringList list;
-			  const QDir fileDir(dir);
-			  const QStringList files = fileDir.entryList(QDir::Files, QDir::Name);
+					//自动保存所有角色身体部件
+					string dir = ModelMng->GetModelPath();
+					string filenameToLower;
+					QStringList list;
+					const QDir fileDir(dir);
+					const QStringList files = fileDir.entryList(QDir::Files, QDir::Name);
 
-			  for (int i = 0; i < files.size(); i++)
-			  {
-				  const QString name = files[i].toLower();
+					for (int i = 0; i < files.size(); i++)
+					{
+						const QString name = files[i].toLower();
 
-				  if ((name.startsWith("part_f") || name.startsWith("part_m")) && name.endsWith("o3d"))
-				  {
-					  list.push_back(files[i].left(files[i].size()));
-				  }
-			  }
+						if ((name.startsWith("part_f") || name.startsWith("part_m")) && name.endsWith("o3d"))
+						{
+							list.push_back(files[i].left(files[i].size()));
+						}
+					}
 
-			  for (int i = 0; i < list.size(); ++i){
-				  string partFileName = list[i];
-				  //先清理
-				  for (int p = 0; p < MAX_ANIMATED_ELEMENTS; p++){
-					  Delete(m_mesh->m_elements[p].obj);
-				  }
-				  OpenFile(dir + partFileName);
+					for (int i = 0; i < list.size(); ++i){
+						string partFileName = list[i];
+						//先清理
+						for (int p = 0; p < MAX_ANIMATED_ELEMENTS; p++){
+							Delete(m_mesh->m_elements[p].obj);
+						}
+						OpenFile(dir + partFileName);
 
-				  string filename = dir % "/PartDAE/" % partFileName.replace(".o3d", ".dae");
-				  QFileInfo fileInfo(filename);
-				  m_filename = fileInfo.fileName();
-				  _saveFile(filename, ExpMesh);
-				  //break;
-			  }
+						string filename = dir % "AutoSave/Player/PartDAE/" % partFileName.replace(".o3d", ".dae");
+						QFileInfo fileInfo(filename);
+						m_filename = fileInfo.fileName();
+						_saveFile(filename, ExpMesh);
+						break;
+					}
 	}
 
 		break;

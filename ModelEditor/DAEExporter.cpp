@@ -94,7 +94,9 @@ void CDAEExporter::_writeImages()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
-		if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+		bool has = it.key().contains("LOD");
+		bool has1 = it.key().contains("LOD1");
+		if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Obj0")/*!it.key().contains("Material0")*/))
 			continue;
 		const string texId = string(it.value()->textureName).toLower().replace('.', '_').replace('-', '_').replace(' ', '_') % '-' % it.key();
 		QDomElement texture = m_doc.createElement("image");
@@ -122,7 +124,7 @@ void CDAEExporter::_writeEffects()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
-		if (m_exportType == ExpMesh &&  it.key().contains("LOD"))
+		if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Material0")))
 			continue;
 
 		const string texID = string(it.value()->textureName).toLower().replace('.', '_').replace('-', '_').replace(' ', '_') % '-' % it.key();
@@ -251,7 +253,7 @@ void CDAEExporter::_writeMaterials()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
-		if (m_exportType == ExpMesh &&  it.key().contains("LOD"))
+		if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Material0")))
 			continue;
 		QDomElement material = m_doc.createElement("material");
 		material.setAttribute("id", it.key() % "-material");
@@ -562,15 +564,26 @@ void CDAEExporter::_writeAnimations()
 
 			for (int i = 0; i < m_frameCount; i++)
 			{
-				trans = frames[i].pos;
-				quat = frames[i].rot;
+				if (frames == null)
+				{
+					qDebug(("failed: " % animName % " frame="  %  QString::number(i) % " of " % QString::number(m_frameCount) % "").toLocal8Bit().data());
+					continue;
+				}
+				try {
+					trans = frames[i].pos;
+					quat = frames[i].rot;
 
-				D3DXMatrixTranslation(&m1, trans.x, trans.y, trans.z);
-				m2 = _getRotationMatrix(quat);
+					D3DXMatrixTranslation(&m1, trans.x, trans.y, trans.z);
+					m2 = _getRotationMatrix(quat);
 
-				m2 *= m1;
+					m2 *= m1;
 
-				fList.append(_matToString(m2));
+					fList.append(_matToString(m2));
+				}
+				catch (int a) {
+					qDebug(("failed: " % animName % " frame="  %  QString::number(i) % " of " % QString::number(m_frameCount) % "").toLocal8Bit().data());
+				}
+				
 			}
 			float_array.appendChild(m_doc.createTextNode(fList));
 			source.appendChild(float_array);
@@ -667,7 +680,7 @@ void CDAEExporter::_writeControllers()
 		obj = it.value();
 		if (obj->type != GMT_SKIN)
 			continue;
-		
+
 		SkinVertex* vertices = (SkinVertex*)obj->vertices;
 		const int vertexCount = obj->vertexCount;
 

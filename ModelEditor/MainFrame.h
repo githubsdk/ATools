@@ -90,7 +90,9 @@ private:
 	void _connectWidgets();
 	void _loadSettings();
 	void _setShortcuts();
-	void AutoSaveFiles(EExportType exportType);
+	void AutoSaveFiles(EExportType exportType, string fileNameWithoutExt=null);
+	void AutoSaveMvr();
+	void SaveMvr(string& dir, string& mvrName);
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent* event);
 	virtual void dragLeaveEvent(QDragLeaveEvent* event);
