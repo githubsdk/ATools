@@ -196,12 +196,13 @@ CExporter::CExporter(CAnimatedMesh* mesh)
 	}
 
 	m_frameCount = 0;
-	if (obj3D->m_frameCount > 0)
-		m_frameCount = obj3D->m_frameCount;
-	else if (motion && motion->m_frameCount > 0)
+	//优先使用motion里的帧数，不然导出动作时，帧数量会错误
+	if (motion && motion->m_frameCount > 0)
 		m_frameCount = motion->m_frameCount;
-
-	if (obj3D->m_frameCount > 0)
+	else if(obj3D->m_frameCount > 0)
+		m_frameCount = obj3D->m_frameCount;
+	
+	if (m_frameCount > 0)
 	{
 		for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 		{
