@@ -292,7 +292,7 @@ void CLandscape::UpdateTextureLayers()
 		layer->lightMap->UnlockRect(0);
 		char filename[256];
 		sprintf(filename, "c:/lnd_%d_%d_layer_%d.png", m_posX / MAP_SIZE, m_posY / MAP_SIZE, i);
-		D3DXSaveTextureToFileA(filename, D3DXIFF_PNG, layer->lightMap, null);
+		//D3DXSaveTextureToFileA(filename, D3DXIFF_PNG, layer->lightMap, null);
 	}
 }
 
