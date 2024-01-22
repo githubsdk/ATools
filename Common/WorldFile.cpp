@@ -519,6 +519,9 @@ bool CWorld::_saveRgnFile(const string& filename)
 		qCritical(("Cant create file '" % filename % "'").toLocal8Bit());
 		return false;
 	}
+
+	QJsonObject jsonRoot;
+	
 	const byte header[2] = { 0xff, 0xfe };
 	file.write((const char*)header, (qint64)sizeof(header));
 	QTextStream out(&file);
@@ -527,10 +530,13 @@ bool CWorld::_saveRgnFile(const string& filename)
 
 	out << "// Region Script File" << endl << endl;
 
+
 	int i;
 	CSpawnObject* obj;
 	CRegion* reg;
 
+	QJsonArray ctrlArray;
+	jsonRoot.insert(QString::number(OT_CTRL), ctrlArray);
 	for (i = 0; i < m_objects[OT_CTRL].GetSize(); i++)
 	{
 		obj = (CSpawnObject*)m_objects[OT_CTRL].GetAt(i);
@@ -538,6 +544,8 @@ bool CWorld::_saveRgnFile(const string& filename)
 			obj->WriteRespawn(out);
 	}
 
+	QJsonArray itemArray;
+	jsonRoot.insert(QString::number(OT_ITEM), itemArray);
 	for (i = 0; i < m_objects[OT_ITEM].GetSize(); i++)
 	{
 		obj = (CSpawnObject*)m_objects[OT_ITEM].GetAt(i);
@@ -545,21 +553,49 @@ bool CWorld::_saveRgnFile(const string& filename)
 			obj->WriteRespawn(out);
 	}
 
+	QJsonArray moverArray;
 	for (i = 0; i < m_objects[OT_MOVER].GetSize(); i++)
 	{
 		obj = (CSpawnObject*)m_objects[OT_MOVER].GetAt(i);
 		if (obj->IsReal() && obj->IsRespawn())
+		{
 			obj->WriteRespawn(out);
+			obj->WriteRespawnJson(moverArray);
+		}
 	}
+	jsonRoot.insert("mover", QString::number(OT_MOVER));
+	jsonRoot.insert(QString::number(OT_MOVER), moverArray);
 
+	QJsonArray regionArray;
+	
 	for (i = 0; i < m_objects[OT_REGION].GetSize(); i++)
 	{
 		reg = (CRegion*)m_objects[OT_REGION].GetAt(i);
 		if (reg->IsReal())
 			reg->WriteRegion(out);
 	}
+	jsonRoot.insert(QString::number(OT_REGION), regionArray);
+	jsonRoot.insert("end", 1);
 
 	file.close();
+	
+	//--------------------------–¥»Îjson
+	string jsonName = filename;
+	jsonName = jsonName.replace(".rgn", ".json");
+	QFile jsonFile(jsonName);
+	if (!jsonFile.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		qCritical(("Cant create file '" % jsonName % "'").toLocal8Bit());
+		return false;
+	}
+	QTextStream jsonSteam(&jsonFile);
+	jsonSteam.setCodec("UTF-8");
+
+	QJsonDocument jsonDoc;
+	jsonDoc.setObject(jsonRoot);
+
+	jsonSteam << jsonDoc.toJson();
+	jsonFile.close();
 	return true;
 }
 

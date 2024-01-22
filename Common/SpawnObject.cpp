@@ -115,6 +115,50 @@ void CSpawnObject::ReadRespawn(CTextFile* file)
 	}
 }
 
+void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray)
+{
+	const QRect rect = m_rect.normalized();
+
+	QJsonObject respawn;
+	
+	respawn.insert("type", (int)m_type);
+	respawn.insert("modelID", (int)m_modelID);
+
+	QJsonObject pos;
+	pos.insert("x", m_pos.x);
+	pos.insert("y", m_pos.y);
+	pos.insert("z", m_pos.z);
+	respawn.insert("pos", pos);
+
+	respawn.insert("count", m_count);
+	respawn.insert("attackCount", m_attackCount);
+
+	QJsonObject rectInfo;
+	rectInfo.insert("x", rect.x());
+	rectInfo.insert("y", rect.y());
+	rectInfo.insert("xMax", rect.right());
+	rectInfo.insert("yMax", rect.bottom());
+	respawn.insert("rect", rectInfo);
+
+	respawn.insert("dayMin", m_dayMin);
+	respawn.insert("dayMax", m_dayMax);
+	respawn.insert("hourMin", m_hourMin);
+	respawn.insert("hourMax", m_hourMax);
+	respawn.insert("itemMin", m_itemMin);
+	respawn.insert("itemMax", m_itemMax);
+	respawn.insert("aiState", m_aiState);
+	respawn.insert("rotY", m_rot.y);
+	respawn.insert("patrolIndex", m_patrolIndex);
+	respawn.insert("patrolCycle", m_patrolCycle);
+	if (m_type == OT_CTRL)
+	{
+		CCtrl* ctrl = (CCtrl*)this;
+		CtrlElem& elem = ctrl->m_elem;
+		int i;
+	}
+	jsonArray.append(respawn);
+}
+
 void CSpawnObject::WriteRespawn(QTextStream& file)
 {
 	const QRect rect = m_rect.normalized();
