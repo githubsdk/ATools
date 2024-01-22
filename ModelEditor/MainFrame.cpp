@@ -600,18 +600,18 @@ void CMainFrame::SaveFile()
 		/*ModelMng->SetModelPath(fileInfo.path() % '/');
 		TextureMng->SetModelTexturePath(fileInfo.path() % '/');*/
 		m_filename = fileInfo.fileName();
-		//_saveFile(filename);
+		_saveFile(filename);
 
-		string dir = ModelMng->GetModelPath();
-		SaveMvr(dir, fileInfo.fileName());
+		/*string dir = ModelMng->GetModelPath();
+		SaveMvr(dir, fileInfo.fileName());*/
 		return;
 	}
-	if (SEX_SEXLESS == m_meshSex){
+	/*if (SEX_SEXLESS == m_meshSex){
 		AutoSaveMvr();
 	}
 	else{
 		AutoSaveFiles(ExpAnim);
-	}
+	}*/
 }
 
 void CMainFrame::SaveMvr(string& dir, string& mvrName){
