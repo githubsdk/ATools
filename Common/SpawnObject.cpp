@@ -115,11 +115,13 @@ void CSpawnObject::ReadRespawn(CTextFile* file)
 	}
 }
 
-void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray)
+void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray, int id)
 {
 	const QRect rect = m_rect.normalized();
 
 	QJsonObject respawn;
+
+	respawn.insert("id", id);
 	
 	respawn.insert("type", (int)m_type);
 	respawn.insert("modelID", (int)m_modelID);
@@ -134,10 +136,16 @@ void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray)
 	respawn.insert("attackCount", m_attackCount);
 
 	QJsonObject rectInfo;
-	rectInfo.insert("x", rect.x());
-	rectInfo.insert("y", rect.y());
-	rectInfo.insert("xMax", rect.right());
-	rectInfo.insert("yMax", rect.bottom());
+	//还不清楚为什么xy和坐标是反着的
+	rectInfo.insert("x", rect.y());
+	rectInfo.insert("y", rect.x());
+	//有些区域是负数，不知道为什么
+	int rangeValue = rect.bottom();
+	rangeValue = rangeValue <= rect.y() ? rect.y() + 1 : rangeValue;
+	rectInfo.insert("xMax", rangeValue);
+	rangeValue = rect.right();
+	rangeValue = rangeValue <= rect.x() ? rect.x() + 1 : rangeValue;
+	rectInfo.insert("yMax", rangeValue);
 	respawn.insert("rect", rectInfo);
 
 	respawn.insert("dayMin", m_dayMin);

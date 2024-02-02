@@ -30,7 +30,7 @@ public:
 
 	void ReadRespawn(CTextFile* file);
 	void WriteRespawn(QTextStream& file);
-	void WriteRespawnJson(QJsonArray& jsonArray);
+	void WriteRespawnJson(QJsonArray& jsonArray, int id);
 
 	bool IsRespawn() const {
 		return m_isRespawn;

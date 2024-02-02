@@ -560,10 +560,9 @@ bool CWorld::_saveRgnFile(const string& filename)
 		if (obj->IsReal() && obj->IsRespawn())
 		{
 			obj->WriteRespawn(out);
-			obj->WriteRespawnJson(moverArray);
+			obj->WriteRespawnJson(moverArray, i+1);
 		}
 	}
-	jsonRoot.insert("mover", QString::number(OT_MOVER));
 	jsonRoot.insert(QString::number(OT_MOVER), moverArray);
 
 	QJsonArray regionArray;
@@ -575,7 +574,6 @@ bool CWorld::_saveRgnFile(const string& filename)
 			reg->WriteRegion(out);
 	}
 	jsonRoot.insert(QString::number(OT_REGION), regionArray);
-	jsonRoot.insert("end", 1);
 
 	file.close();
 	
