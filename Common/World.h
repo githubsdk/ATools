@@ -146,7 +146,8 @@ public:
 	bool PickTerrain(const QPoint& mousePos, D3DXVECTOR3& out);
 	CObject* PickObject(const QPoint& mousePos);
 	void SelectObjects(const QRect& rect);
-
+	int GetCullObjectCount(){ return m_cullObjCount; };
+	CObject* GetCullObjectAt(int objIndex);
 private:
 	LPDIRECT3DDEVICE9 m_device;
 	int m_width;

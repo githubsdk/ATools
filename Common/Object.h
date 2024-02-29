@@ -91,6 +91,8 @@ public:
 		return m_modelID;
 	}
 
+	virtual string GetRenderName(){ return GetModelFilename(); }
+
 protected:
 	ulong m_ID;
 	uint m_type;

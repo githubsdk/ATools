@@ -175,6 +175,7 @@ bool CMainFrame::Initialize()
 	ui.menuFen_tres->addAction(ui.dockGameElements->toggleViewAction());
 	ui.menuFen_tres->addAction(ui.dockTerrainEdit->toggleViewAction());
 	ui.menuFen_tres->addAction(ui.dockPatrolEditor->toggleViewAction());
+	ui.menuFen_tres->addAction(ui.dockmoversInView->toggleViewAction());
 
 	m_actionEditMode = new QActionGroup(this);
 	m_actionEditMode->addAction(ui.actionD_placer_cam_ra);
@@ -301,6 +302,7 @@ void CMainFrame::_connectWidgets()
 	connect(ui.gameElementsTree, SIGNAL(clicked(const QModelIndex &)), this, SLOT(SelectGameElement(const QModelIndex &)));
 	connect(ui.gameElementsTree, SIGNAL(activated(const QModelIndex &)), this, SLOT(SelectGameElement(const QModelIndex &)));
 	connect(ui.editTerrainLayerList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(SetEditTexture(QListWidgetItem*)));
+	connect(ui.moverList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(SetSelectObject(QListWidgetItem*)));
 	connect(ui.actionPropri_t_s_du_monde, SIGNAL(triggered()), this, SLOT(EditWorldProperties()));
 	connect(ui.optimizeWater, SIGNAL(clicked()), this, SLOT(OptimizeWater()));
 	connect(ui.waterFillMap, SIGNAL(clicked()), this, SLOT(FillAllMapWithWater()));

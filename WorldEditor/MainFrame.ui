@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>800</height>
+    <width>1331</width>
+    <height>1198</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -942,8 +942,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
-     <height>21</height>
+     <width>1331</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFichier">
@@ -1063,6 +1063,9 @@
     <addaction name="actionPlein_cran"/>
    </widget>
    <widget class="QMenu" name="menuFen_tres">
+    <property name="locale">
+     <locale language="English" country="UnitedStates"/>
+    </property>
     <property name="title">
      <string>Fenêtres</string>
     </property>
@@ -1238,6 +1241,43 @@
      </item>
      <item>
       <widget class="QListWidget" name="patrolList">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockmoversInView">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>视野内的Mover列表</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_5">
+    <layout class="QGridLayout" name="gridLayout_4">
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QListWidget" name="moverList">
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>

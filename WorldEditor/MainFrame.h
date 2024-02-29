@@ -66,6 +66,7 @@ public:
 
 	void SetStatusBarInfo(const D3DXVECTOR3& pos, int landX, int landY, int layerCount, const string& obj, const string& texture, int waterHeight = -1);
 	void SetLayerInfos(CLandscape* land);
+	void SetVisibleMovers();
 	void RotateObjects(int key);
 
 	void AddCommand(CEditCommand* command);
@@ -141,6 +142,7 @@ public slots:
 	void DeleteLandLayer();
 	void SelectGameElement(const QModelIndex& index);
 	void SetEditTexture(QListWidgetItem * item);
+	void SetSelectObject(QListWidgetItem * item);
 	void EditWorldProperties();
 	void OptimizeWater();
 	void DialogWorldPropertiesClosed(int result);

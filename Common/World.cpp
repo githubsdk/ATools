@@ -576,3 +576,9 @@ void CWorld::UpdateSpawns()
 	for (i = 0; i < spawnObjects.GetSize(); i++)
 		SpawnObject(spawnObjects[i], g_global3D.spawnAllMovers);
 }
+
+CObject* CWorld::GetCullObjectAt(int objIndex){
+	if (objIndex < m_cullObjCount){
+		return m_objCull[objIndex];
+	}
+}

@@ -28,6 +28,7 @@ public:
 	virtual void Write(CFile& file, const D3DXVECTOR3& posOffset);
 	virtual bool Init();
 	virtual void RenderName();
+	virtual string GetRenderName();
 
 	virtual DWORD GetRectColor() {
 		return 0xffff0000;

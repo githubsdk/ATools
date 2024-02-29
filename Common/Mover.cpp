@@ -107,6 +107,11 @@ void CMover::RenderName()
 		IsPeaceful() ? 0xffa0a0ff : 0xffffffa0);
 }
 
+string CMover::GetRenderName(){
+	const string& name = m_character ? m_character->name : m_moverProp->name;
+	return name;
+}
+
 void CMover::_loadModel()
 {
 	CObject::_loadModel();

@@ -647,7 +647,10 @@ void CWorldEditor::mouseMoveEvent(QMouseEvent* event)
 	_updateMouse3D(mousePos);
 
 	if (!IsAutoRefresh())
+	{
 		RenderEnvironment();
+		MainFrame->SetVisibleMovers();
+	}
 
 	m_lastMousePos = mousePos;
 }

@@ -11,6 +11,7 @@
 #include <Landscape.h>
 #include <Project.h>
 #include <GameElements.h>
+#include "Object.h"
 
 void CMainFrame::UpdatePatrolList()
 {
@@ -144,6 +145,19 @@ void CMainFrame::SetGridSize()
 float CMainFrame::GetGridSize()
 {
 	return m_gridSize;
+}
+
+void CMainFrame::SetSelectObject(QListWidgetItem * item){
+	if (!item)
+		return;
+
+	int objID = item->type() - QListWidgetItem::UserType - 1;
+	CObject* obj = m_world->GetObject(objID);
+	if (obj != null){
+		CWorld::s_selection.RemoveAll();
+		CWorld::s_selection.Append(obj);
+		m_editor->RenderEnvironment();
+	}
 }
 
 void CMainFrame::SetEditTexture(QListWidgetItem * item)
@@ -298,6 +312,24 @@ void CMainFrame::SetLayerInfos(CLandscape* land)
 				ui.editTerrainLayerList->addItem(item);
 			}
 		}
+	}
+}
+
+void CMainFrame::SetVisibleMovers()
+{
+	CObject* obj;
+	
+	int cullObjectCount = m_world->GetCullObjectCount();
+	QListWidgetItem* item;
+	ui.moverList->clear();
+	for (int j = 0; j < cullObjectCount; j++)
+	{
+		obj = m_world->GetCullObjectAt(j);
+		if (obj->GetType() == OT_MOVER){
+			item = new QListWidgetItem(obj->GetRenderName() % " model: " % QString::number(obj->GetModelID()) % " ID:" % QString::number(obj->GetID()), ui.moverList, QListWidgetItem::UserType + 1 + obj->GetID());
+			ui.moverList->addItem(item);
+		}
+		
 	}
 }
 
