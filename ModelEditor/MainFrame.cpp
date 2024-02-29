@@ -509,7 +509,7 @@ void CMainFrame::OpenFile(const string& filename)
 	m_status->setText(tr("Prêt"));
 }
 
-void CMainFrame::_saveFile(const string& filename, EExportType exportType)
+void CMainFrame::_saveFile(const string& filename, QStringList& excludeNodePrefix, EExportType exportType)
 {
 	if (!m_mesh)
 		return;
@@ -517,7 +517,7 @@ void CMainFrame::_saveFile(const string& filename, EExportType exportType)
 	bool result = false;
 	if (GetExtension(filename) == "dae")
 	{
-		result = CDAEExporter(m_mesh, exportType).Export(filename);
+		result = CDAEExporter(m_mesh, exportType, excludeNodePrefix).Export(filename);
 	}
 	else if (GetExtension(filename) == "obj")
 	{
@@ -600,18 +600,36 @@ void CMainFrame::SaveFile()
 		/*ModelMng->SetModelPath(fileInfo.path() % '/');
 		TextureMng->SetModelTexturePath(fileInfo.path() % '/');*/
 		m_filename = fileInfo.fileName();
-		_saveFile(filename);
+		QStringList exclude;
+		_saveFile(filename, exclude);
 
 		/*string dir = ModelMng->GetModelPath();
 		SaveMvr(dir, fileInfo.fileName());*/
+		//return;
+		QStringList list;
+		//ctrl, item
+		/*list.push_back("obj_");*/
+		list.push_back("ctrl_");
+		list.push_back("item_");
+		list.push_back("region_");
+		list.push_back("sfx_");
+		
+		AutoSaveFiles(ExpMesh, list, "CtrlItem", null);
 		return;
 	}
-	/*if (SEX_SEXLESS == m_meshSex){
+	if (SEX_SEXLESS == m_meshSex){
 		AutoSaveMvr();
 	}
 	else{
-		AutoSaveFiles(ExpAnim);
-	}*/
+		QStringList list;
+		//男女身体部件
+		/*list.push_back("part_m");
+		list.push_back("part_f");*/
+		//ctrl, item
+		list.push_back("obj_");
+		list.push_back("ctrl_");
+		AutoSaveFiles(ExpAnim, list, null, null);
+	}
 }
 
 void CMainFrame::SaveMvr(string& dir, string& mvrName){
@@ -620,8 +638,11 @@ void CMainFrame::SaveMvr(string& dir, string& mvrName){
 	string filename = dir % "AutoSave/Mvr/ModelDAE/" % fileNameWithoutExt % ".dae";
 	QFileInfo fileInfo(filename);
 	m_filename = fileInfo.fileName();
-	_saveFile(filename, ExpMesh);
-	AutoSaveFiles(ExpAnim, fileNameWithoutExt);
+	QStringList exclude;
+	exclude.push_back("LOD");
+	_saveFile(filename, exclude, ExpMesh);
+	QStringList list;
+	AutoSaveFiles(ExpAnim, list, null, fileNameWithoutExt);
 }
 
 void CMainFrame::AutoSaveMvr(){
@@ -655,11 +676,14 @@ void CMainFrame::AutoSaveMvr(){
 	}
 }
 
-void CMainFrame::AutoSaveFiles(EExportType exportType, string fileNameWithoutExt){
+void CMainFrame::AutoSaveFiles(EExportType exportType, QStringList &fileNamePrefix, string targetFolder, string fileNameWithoutExt){
+	QStringList exclude;
+	
 	switch (exportType)
 	{
 	case ExpAnim:
 	{
+					exclude.push_back("LOD");
 					//自动保存所有动作
 					int motionCount = m_motionList->stringList().count();
 					for (int motionIndex = 0; motionIndex < motionCount; ++motionIndex){
@@ -675,17 +699,17 @@ void CMainFrame::AutoSaveFiles(EExportType exportType, string fileNameWithoutExt
 								//这个动作会报错，做的也不对
 								continue;
 							}
-							string filename = ModelMng->GetModelPath() % "AutoSave/Mvr/MotionDAE/" % daeName;
+							string filename = ModelMng->GetModelPath() % "AutoSave/"% targetFolder %"/MotionDAE/" % daeName;
 							QFileInfo fileInfo(filename);
-							_saveFile(filename, exportType);
+							_saveFile(filename, exclude, exportType);
 						}
 						else{
 							//角色部件，逻辑和mvr是不一样的，需要分开写
 							string daeName = "@" % motion % ".dae";
-							string filename = ModelMng->GetModelPath() % "AutoSave/Player/MotionDAE/" % m_motionName.replace(".ani", daeName);
+							string filename = ModelMng->GetModelPath() % "AutoSave/" % targetFolder % "/MotionDAE/" % m_motionName.replace(".ani", daeName);
 							QFileInfo fileInfo(filename);
 							m_filename = fileInfo.fileName();
-							_saveFile(filename, exportType);
+							_saveFile(filename, exclude, exportType);
 						}
 						
 					}
@@ -694,6 +718,8 @@ void CMainFrame::AutoSaveFiles(EExportType exportType, string fileNameWithoutExt
 		break;
 	case ExpMesh:
 	{
+					exclude.push_back("LOD");
+					exclude.push_back("coll");
 					//自动保存所有角色身体部件
 					string dir = ModelMng->GetModelPath();
 					string filenameToLower;
@@ -704,8 +730,14 @@ void CMainFrame::AutoSaveFiles(EExportType exportType, string fileNameWithoutExt
 					for (int i = 0; i < files.size(); i++)
 					{
 						const QString name = files[i].toLower();
-
-						if ((name.startsWith("part_f") || name.startsWith("part_m")) && name.endsWith("o3d"))
+						bool nameInFilter = false;
+						for (int filterIndex = 0; filterIndex < fileNamePrefix.size(); ++filterIndex){
+							if (name.startsWith(fileNamePrefix[filterIndex])){
+								nameInFilter = true;
+								break;
+							}
+						}
+						if (nameInFilter && name.endsWith("o3d"))
 						{
 							list.push_back(files[i].left(files[i].size()));
 						}
@@ -719,11 +751,10 @@ void CMainFrame::AutoSaveFiles(EExportType exportType, string fileNameWithoutExt
 						}
 						OpenFile(dir + partFileName);
 
-						string filename = dir % "AutoSave/Player/PartDAE/" % partFileName.replace(".o3d", ".dae");
+						string filename = dir % "AutoSave/" % targetFolder %"/DAE/" % partFileName.replace(".o3d", ".dae");
 						QFileInfo fileInfo(filename);
 						m_filename = fileInfo.fileName();
-						_saveFile(filename, ExpMesh);
-						break;
+						_saveFile(filename, exclude, ExpAll);
 					}
 	}
 

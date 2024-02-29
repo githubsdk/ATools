@@ -133,6 +133,7 @@ void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray, int id)
 	respawn.insert("pos", pos);
 
 	respawn.insert("count", m_count);
+	respawn.insert("time", m_time);
 	respawn.insert("attackCount", m_attackCount);
 
 	QJsonObject rectInfo;

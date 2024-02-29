@@ -19,6 +19,7 @@ class CDAEExporter : public CExporter
 public:
 	CDAEExporter(CAnimatedMesh* mesh);
 	CDAEExporter(CAnimatedMesh* mesh, EExportType exportType);
+	CDAEExporter(CAnimatedMesh* mesh, EExportType exportType, QStringList &excludePrefix);
 
 	virtual bool Export(const string& filename);
 
@@ -33,6 +34,11 @@ private:
 	QDomDocument m_doc;
 	QDomElement m_colladaNode;
 	EExportType m_exportType;
+	//要排除的元素名字前缀
+	QStringList m_excludeNamePrefix;
+
+	bool CheckNameInExcludeList(const string &name);
+	/*bool CheckNameInExcludeList(Key &name);*/
 
 	void _writeAsset();
 	void _writeCameras();

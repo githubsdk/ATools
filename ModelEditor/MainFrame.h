@@ -85,12 +85,12 @@ private:
 	int m_language;
 	QActionGroup* m_languageActionGroup;
 
-	void _saveFile(const string& filename, EExportType exportType = ExpAll);
+	void _saveFile(const string& filename, QStringList& excludeNodePrefix, EExportType exportType = ExpAll);
 
 	void _connectWidgets();
 	void _loadSettings();
 	void _setShortcuts();
-	void AutoSaveFiles(EExportType exportType, string fileNameWithoutExt=null);
+	void AutoSaveFiles(EExportType exportType, QStringList& fileNamePrefix, string targetFolder, string fileNameWithoutExt = null);
 	void AutoSaveMvr();
 	void SaveMvr(string& dir, string& mvrName);
 protected:

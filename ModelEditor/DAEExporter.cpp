@@ -20,6 +20,27 @@ CDAEExporter::CDAEExporter(CAnimatedMesh* mesh, EExportType exportType)
 	m_exportType = exportType;
 }
 
+CDAEExporter::CDAEExporter(CAnimatedMesh* mesh, EExportType exportType, QStringList &excludePrefix)
+: CExporter(mesh)
+{
+	m_exportType = exportType;
+	m_excludeNamePrefix = excludePrefix;
+}
+
+bool CDAEExporter::CheckNameInExcludeList(const string &name)
+{
+	const string  lowName = name.toLower();
+	for (int i = 0; i < m_excludeNamePrefix.size(); i++)
+	{
+		const QString prefix = m_excludeNamePrefix[i].toLower();
+		if (lowName.startsWith(prefix))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool CDAEExporter::Export(const string& filename)
 {
 	m_doc.appendChild(m_doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\""));
@@ -94,10 +115,12 @@ void CDAEExporter::_writeImages()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
-		bool has = it.key().contains("LOD");
-		bool has1 = it.key().contains("LOD1");
-		if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Obj0")/*!it.key().contains("Material0")*/))
+		////不记得这里Obj0是怎么回事了
+		//if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Obj0")/*!it.key().contains("Material0")*/))
+		//	continue;
+		if (CheckNameInExcludeList(it.key()))
 			continue;
+		
 		const string texId = string(it.value()->textureName).toLower().replace('.', '_').replace('-', '_').replace(' ', '_') % '-' % it.key();
 		QDomElement texture = m_doc.createElement("image");
 		texture.setAttribute("id", texId);
@@ -124,7 +147,10 @@ void CDAEExporter::_writeEffects()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
-		if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Material0")))
+		//不记得这里的Material0怎么回事了
+		/*if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Material0")))
+			continue;*/
+		if (CheckNameInExcludeList(it.key()))
 			continue;
 
 		const string texID = string(it.value()->textureName).toLower().replace('.', '_').replace('-', '_').replace(' ', '_') % '-' % it.key();
@@ -253,7 +279,10 @@ void CDAEExporter::_writeMaterials()
 
 	for (auto it = m_materials.begin(); it != m_materials.end(); it++)
 	{
-		if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Material0")))
+		//不记得这里的Material0怎么回事了
+		/*if (m_exportType == ExpMesh && (it.key().contains("LOD") || !it.key().contains("Material0")))
+			continue;*/
+		if (CheckNameInExcludeList(it.key()))
 			continue;
 		QDomElement material = m_doc.createElement("material");
 		material.setAttribute("id", it.key() % "-material");
@@ -274,7 +303,9 @@ void CDAEExporter::_writeGeometries()
 	GMObject* obj;
 	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
-		if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+		/*if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+			continue;*/
+		if (CheckNameInExcludeList(it.key()))
 			continue;
 		obj = it.value();
 		const QString meshID = it.key() % "-mesh";
@@ -506,14 +537,19 @@ void CDAEExporter::_writeAnimations()
 	string daeName = strList.last();
 	string animName = daeName.replace(".dae", "");
 	TMAnimation* frames = null;
+	int motionIndex = 0;
 	for (auto it = m_animations.begin(); it != m_animations.end(); it++)
 	{
+		int count = m_animations.count();
+		if (count > 1){
+			int bbb = 1;
+		}
 		const string aniID = it.key();
 		frames = it.value();
 
 		QDomElement animation = m_doc.createElement("animation");
 		animation.setAttribute("id", aniID);
-		animation.setAttribute("name", animName);
+		animation.setAttribute("name", animName % "_" % QString::number(motionIndex));
 		animations.appendChild(animation);
 
 		{
@@ -662,6 +698,7 @@ void CDAEExporter::_writeAnimations()
 		objID.remove(aniID.size() - 10, 10);
 		channel.setAttribute("target", objID % "/transform");
 		animation.appendChild(channel);
+		motionIndex++;
 	}
 }
 
@@ -675,7 +712,9 @@ void CDAEExporter::_writeControllers()
 	GMObject* obj;
 	for (auto it = m_objects.begin(); it != m_objects.end(); it++)
 	{
-		if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+		/*if (m_exportType == ExpMesh&&it.key().contains("LOD"))
+			continue;*/
+		if (CheckNameInExcludeList(it.key()))
 			continue;
 		obj = it.value();
 		if (obj->type != GMT_SKIN)
@@ -964,7 +1003,9 @@ void CDAEExporter::_writeVisualScenes()
 
 void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject* obj)
 {
-	if (m_exportType == ExpMesh&&name.contains("LOD"))
+	/*if (m_exportType == ExpMesh&&name.contains("LOD"))
+		return;*/
+	if (CheckNameInExcludeList(name))
 		return;
 	QDomElement node = m_doc.createElement("node");
 	node.setAttribute("id", name);
@@ -1034,7 +1075,9 @@ void CDAEExporter::_writeNode(QDomElement* parent, const string& name, GMObject*
 
 void CDAEExporter::_writeNode(QDomElement* parent, const string& name, Bone* bone)
 {
-	if (m_exportType == ExpMesh&&name.contains("LOD"))
+	/*if (m_exportType == ExpMesh&&name.contains("LOD"))
+		return;*/
+	if (CheckNameInExcludeList(name))
 		return;
 	QDomElement node = m_doc.createElement("node");
 	node.setAttribute("id", name);
