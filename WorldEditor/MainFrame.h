@@ -143,6 +143,7 @@ public slots:
 	void SelectGameElement(const QModelIndex& index);
 	void SetEditTexture(QListWidgetItem * item);
 	void SetSelectObject(QListWidgetItem * item);
+	void SetSelectFoundObject(int row, int column);
 	void EditWorldProperties();
 	void OptimizeWater();
 	void DialogWorldPropertiesClosed(int result);
@@ -177,8 +178,11 @@ public slots:
 	void SetFarPlane();
 	void SetGravityEnabled(bool gravity);
 	void SetOnGridEnabled(bool grid);
+	void MoveCameToPosition(); 
+	void FindObjectInWorld();
 
 private:
+	void MoveCameraToPosition(float x, float z);
 	Ui::MainFrameClass ui;
 	CProject* m_prj;
 	CWorldEditor* m_editor;

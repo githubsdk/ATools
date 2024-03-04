@@ -62,6 +62,8 @@ CWorld::CWorld(LPDIRECT3DDEVICE9 device)
 	m_objects[OT_OBJ].Allocate(20000);
 	m_objects[OT_SFX].Allocate(10000);
 	m_objects[OT_MOVER].Allocate(5000);
+	//数量是上面三个的总和
+	m_foundObjects.Allocate(35000);
 }
 
 CWorld::~CWorld()
@@ -304,6 +306,37 @@ CPtrArray<CPath>* CWorld::GetPath(int ID) const
 const CPtrArray<CObject>& CWorld::GetObjects(uint type) const
 {
 	return m_objects[type];
+}
+
+const CPtrArray<CObject>& CWorld::SearchObjects(string key)
+{
+	ClearFoundObjects();
+	key = key.toLower();
+	bool isId = false;
+	int objectId = key.toInt(&isId);
+	int j;
+	
+	for (int i = 0; i < MAX_OBJTYPE; i++)
+	{
+		for (j = 0; j < m_objects[i].GetSize(); j++)
+		{
+			CObject* obj = m_objects[i].GetAt(j);
+			if (isId == true){
+				if (obj->m_modelID == objectId)
+					m_foundObjects.Append(obj);
+			}
+			else{
+				string name = obj->GetRenderName().toLower();
+				if (name.contains(key))
+					m_foundObjects.Append(obj);
+			}
+		}
+	}
+	return m_foundObjects;
+}
+
+void CWorld::ClearFoundObjects(){
+	m_foundObjects.RemoveAll();
 }
 
 void CWorld::MoveObject(CObject* obj, const D3DXVECTOR3& newPos)

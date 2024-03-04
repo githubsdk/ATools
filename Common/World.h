@@ -140,6 +140,8 @@ public:
 	CObject* GetObject(objid id, uint type) const;
 	CPtrArray<CPath>* GetPath(int ID) const;
 	const CPtrArray<CObject>& GetObjects(uint type) const;
+	const CPtrArray<CObject>& SearchObjects(string key);
+	void ClearFoundObjects();
 	void SpawnObject(CObject* obj, bool addSpawn);
 	void UpdateSpawns();
 	void MoveObject(CObject* obj, const D3DXVECTOR3& newPos);
@@ -189,6 +191,8 @@ private:
 	CPtrArray<Continent> m_continents;
 	CPathArray m_paths;
 	objid m_nextObjectID;
+	//查找找到的对象列表
+	CPtrArray<CObject> m_foundObjects;
 
 	void _initialize();
 	bool _loadWldFile(const string& filename);

@@ -571,6 +571,70 @@ void CMainFrame::AddPath()
 	UpdateWorldEditor();
 }
 
+void CMainFrame::MoveCameToPosition()
+{
+	if (!m_world)
+		return;
+
+	MoveCameraToPosition(ui.posX->value(), ui.posZ->value());
+}
+
+void CMainFrame::MoveCameraToPosition(float x, float z){
+	
+	float worldXMax = (float)(m_world->m_width * MAP_SIZE * MPU);
+	if (x >= worldXMax)
+		x = worldXMax;
+
+	float worldZMax = (float)(m_world->m_height * MAP_SIZE * MPU);
+	
+	if (z >= worldZMax)
+		z = worldZMax;
+
+	m_world->m_cameraPos.x = x;
+	m_world->m_cameraPos.z = z;
+	m_world->m_cameraPos.y = m_world->GetHeight(m_world->m_cameraPos.x, m_world->m_cameraPos.z) + 200.0f;
+
+	m_world->m_cameraAngle.x = 0.0f;
+	m_world->m_cameraAngle.y = -89.89f;
+
+	m_world->_loadLndFiles();
+
+	if (m_world->m_cameraPos.y > 999.0f)
+		m_world->m_cameraPos.y = 999.0f;
+
+	if (!MainFrame->IsEditingContinents())
+		m_world->UpdateContinent();
+
+	MainFrame->UpdateWorldEditor();
+}
+
+void CMainFrame::FindObjectInWorld()
+{
+	if (!m_world)
+		return;
+	const CPtrArray<CObject>& objects = m_world->SearchObjects(ui.searchContentTxt->text());
+	ui.foundObjTable->clearContents();
+	ui.foundObjTable->setRowCount(objects.GetSize());
+	QListWidgetItem* item;
+	for (int i = 0; i < objects.GetSize(); ++i){
+		CObject *obj = objects[i];
+		ui.foundObjTable->setItem(i, 0, new QTableWidgetItem(obj->GetRenderName()));
+		ui.foundObjTable->setItem(i, 1, new QTableWidgetItem(QString::number(obj->GetModelID())));
+		ui.foundObjTable->setItem(i, 2, new QTableWidgetItem(QString::number(obj->GetID())));
+	}
+}
+
+void CMainFrame::SetSelectFoundObject(int row, int column){
+	QTableWidgetItem * item = ui.foundObjTable->item(row, 2);
+	CObject * obj = m_world->GetObject(item->text().toInt());
+	if (obj != null){
+		MoveCameraToPosition(obj->m_pos.x, obj->m_pos.z);
+		CWorld::s_selection.RemoveAll();
+		CWorld::s_selection.Append(obj);
+		m_editor->RenderEnvironment();
+	}
+}
+
 void CMainFrame::RemovePath()
 {
 	if (!m_world)

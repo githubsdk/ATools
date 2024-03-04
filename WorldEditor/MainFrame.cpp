@@ -176,6 +176,7 @@ bool CMainFrame::Initialize()
 	ui.menuFen_tres->addAction(ui.dockTerrainEdit->toggleViewAction());
 	ui.menuFen_tres->addAction(ui.dockPatrolEditor->toggleViewAction());
 	ui.menuFen_tres->addAction(ui.dockmoversInView->toggleViewAction());
+	ui.menuFen_tres->addAction(ui.dockMsc->toggleViewAction());
 
 	m_actionEditMode = new QActionGroup(this);
 	m_actionEditMode->addAction(ui.actionD_placer_cam_ra);
@@ -332,6 +333,10 @@ void CMainFrame::_connectWidgets()
 	connect(ui.actionChamp_de_vision, SIGNAL(triggered()), this, SLOT(SetFarPlane()));
 	connect(ui.actionGravit, SIGNAL(triggered(bool)), this, SLOT(SetGravityEnabled(bool)));
 	connect(ui.actionPlacer_sur_la_grille, SIGNAL(triggered(bool)), this, SLOT(SetOnGridEnabled(bool)));
+
+	connect(ui.viewPosBtn, SIGNAL(clicked()), this, SLOT(MoveCameToPosition()));
+	connect(ui.searchObjBtn, SIGNAL(clicked()), this, SLOT(FindObjectInWorld()));
+	connect(ui.foundObjTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(SetSelectFoundObject(int, int)));
 
 	connect(m_undoStack, SIGNAL(canRedoChanged(bool)), ui.actionR_tablir, SLOT(setEnabled(bool)));
 	connect(m_undoStack, SIGNAL(canUndoChanged(bool)), ui.actionAnnuler, SLOT(setEnabled(bool)));
