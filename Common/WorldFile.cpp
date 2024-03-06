@@ -560,7 +560,7 @@ bool CWorld::_saveRgnFile(const string& filename)
 		if (obj->IsReal() && obj->IsRespawn())
 		{
 			obj->WriteRespawn(out);
-			obj->WriteRespawnJson(moverArray, i+1);
+			obj->WriteRespawnJson(moverArray, obj->m_ID);
 		}
 	}
 	jsonRoot.insert(QString::number(OT_MOVER), moverArray);

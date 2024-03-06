@@ -385,6 +385,8 @@ bool CTextFile::LoadDefine(const string& filename, bool error)
 
 	int value;
 	file.NextToken();
+
+	QJsonObject jsonRoot;
 	do
 	{
 		if (file.TokenType() == ETokenType::Define)
@@ -393,9 +395,13 @@ bool CTextFile::LoadDefine(const string& filename, bool error)
 			file.SetMark();
 			const string tok = file.GetString();
 			const ETokenType tokType = file.TokenType();
-
+			
 			if (tokType == ETokenType::Number)
-				value = tok.toInt(null, 10);
+			{
+				QByteArray qByteArray = tok.toUtf8();
+				char* tokChar = qByteArray.data();
+				value = atoi(tokChar);// tok.toInt(null, 10);
+			}
 			else if (tokType == ETokenType::Hex)
 				value = tok.toInt(null, 16);
 			else
@@ -406,10 +412,29 @@ bool CTextFile::LoadDefine(const string& filename, bool error)
 			}
 
 			s_defines[id] = value;
+			
+			
+			jsonRoot.insert(id, value);
 		}
 
 		file.NextToken();
 	} while (file.TokenType() != ETokenType::End);
+
+	QFile jsonFile("./"%filename%"_defines.json");
+
+	if (jsonFile.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		QTextStream jsonSteam(&jsonFile);
+		jsonSteam.setCodec("UTF-8");
+
+		QJsonDocument jsonDoc;
+		jsonDoc.setObject(jsonRoot);
+
+		jsonSteam << jsonDoc.toJson();
+		jsonFile.close();
+	}
+
+	
 
 	file.Close();
 	return true;
