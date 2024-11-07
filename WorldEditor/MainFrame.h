@@ -142,7 +142,8 @@ public slots:
 	void DeleteLandLayer();
 	void SelectGameElement(const QModelIndex& index);
 	void SetEditTexture(QListWidgetItem * item);
-	void SetSelectObject(QListWidgetItem * item);
+	void SetSelectObject(int row, int column);
+	void ViewSelectObject(int row, int column);
 	void SetSelectFoundObject(int row, int column);
 	void EditWorldProperties();
 	void OptimizeWater();

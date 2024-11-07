@@ -52,6 +52,7 @@ struct ModelProp
 struct MoverProp
 {
 	string name;
+	string nameIDS;
 	uint AI;
 	uint belligerence;
 	bool fly;
@@ -67,6 +68,7 @@ struct Character
 {
 	string ID;
 	string name;
+	string nameIDS;
 	uint moverID;
 	int hair;
 	uint hairColor;

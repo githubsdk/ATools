@@ -614,7 +614,7 @@ void CMainFrame::SaveFile()
 		list.push_back("region_");
 		list.push_back("sfx_");
 		
-		AutoSaveFiles(ExpMesh, list, "CtrlItem", null);
+		//AutoSaveFiles(ExpMesh, list, "CtrlItem", null);
 		return;
 	}
 	if (SEX_SEXLESS == m_meshSex){

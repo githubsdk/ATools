@@ -112,6 +112,11 @@ string CMover::GetRenderName(){
 	return name;
 }
 
+string CMover::GetRenderNameID(){ 
+	const string& nameIDS = m_character ? m_character->nameIDS : m_moverProp->nameIDS;
+	return nameIDS;
+};
+
 void CMover::_loadModel()
 {
 	CObject::_loadModel();

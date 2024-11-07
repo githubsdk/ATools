@@ -450,7 +450,10 @@ bool CProject::_loadPropMover(const string& filename)
 	do
 	{
 		ID = file.GetInt();
+		file.SetMark();
 		prop.name = file.GetString();
+		file.GoMark();
+		prop.nameIDS = file.GetString(false);
 		prop.AI = (uint)file.GetInt();
 
 		for (i = 0; i < 7; i++)
@@ -614,7 +617,12 @@ bool CProject::_loadCharacter(const string& filename)
 				else if (tok == keys[6])
 				{
 					file.NextToken();
+
+					file.SetMark();
 					character.name = file.GetString();
+					file.GoMark();
+					character.nameIDS = file.GetString(false);
+					
 					file.NextToken();
 					file.NextToken();
 				}

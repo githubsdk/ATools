@@ -303,7 +303,6 @@ void CMainFrame::_connectWidgets()
 	connect(ui.gameElementsTree, SIGNAL(clicked(const QModelIndex &)), this, SLOT(SelectGameElement(const QModelIndex &)));
 	connect(ui.gameElementsTree, SIGNAL(activated(const QModelIndex &)), this, SLOT(SelectGameElement(const QModelIndex &)));
 	connect(ui.editTerrainLayerList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(SetEditTexture(QListWidgetItem*)));
-	connect(ui.moverList, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(SetSelectObject(QListWidgetItem*)));
 	connect(ui.actionPropri_t_s_du_monde, SIGNAL(triggered()), this, SLOT(EditWorldProperties()));
 	connect(ui.optimizeWater, SIGNAL(clicked()), this, SLOT(OptimizeWater()));
 	connect(ui.waterFillMap, SIGNAL(clicked()), this, SLOT(FillAllMapWithWater()));
@@ -337,6 +336,8 @@ void CMainFrame::_connectWidgets()
 	connect(ui.viewPosBtn, SIGNAL(clicked()), this, SLOT(MoveCameToPosition()));
 	connect(ui.searchObjBtn, SIGNAL(clicked()), this, SLOT(FindObjectInWorld()));
 	connect(ui.foundObjTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(SetSelectFoundObject(int, int)));
+	connect(ui.moverList, SIGNAL(cliicked()), this, SLOT(SetSelectObject(int, int)));
+	connect(ui.moverList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(SetSelectObject(int, int)));
 
 	connect(m_undoStack, SIGNAL(canRedoChanged(bool)), ui.actionR_tablir, SLOT(setEnabled(bool)));
 	connect(m_undoStack, SIGNAL(canUndoChanged(bool)), ui.actionAnnuler, SLOT(setEnabled(bool)));

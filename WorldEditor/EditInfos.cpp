@@ -147,19 +147,6 @@ float CMainFrame::GetGridSize()
 	return m_gridSize;
 }
 
-void CMainFrame::SetSelectObject(QListWidgetItem * item){
-	if (!item)
-		return;
-
-	int objID = item->type() - QListWidgetItem::UserType - 1;
-	CObject* obj = m_world->GetObject(objID);
-	if (obj != null){
-		CWorld::s_selection.RemoveAll();
-		CWorld::s_selection.Append(obj);
-		m_editor->RenderEnvironment();
-	}
-}
-
 void CMainFrame::SetEditTexture(QListWidgetItem * item)
 {
 	if (!item)
@@ -321,16 +308,22 @@ void CMainFrame::SetVisibleMovers()
 	
 	int cullObjectCount = m_world->GetCullObjectCount();
 	QListWidgetItem* item;
-	ui.moverList->clear();
-	for (int j = 0; j < cullObjectCount; j++)
+	ui.moverList->clearContents();
+	//ui.moverList->setRowCount(cullObjectCount);
+	int moverCount = 0;
+	for (int i = 0; i < cullObjectCount; i++)
 	{
-		obj = m_world->GetCullObjectAt(j);
+		obj = m_world->GetCullObjectAt(i);
 		if (obj->GetType() == OT_MOVER){
-			item = new QListWidgetItem(obj->GetRenderName() % " model: " % QString::number(obj->GetModelID()) % " ID:" % QString::number(obj->GetID()), ui.moverList, QListWidgetItem::UserType + 1 + obj->GetID());
-			ui.moverList->addItem(item);
+			
+			ui.moverList->setItem(moverCount, 0, new QTableWidgetItem(obj->GetRenderName()));
+			ui.moverList->setItem(moverCount, 1, new QTableWidgetItem(QString::number(obj->GetModelID())));
+			ui.moverList->setItem(moverCount, 2, new QTableWidgetItem(QString::number(obj->GetID())));
+			moverCount++;
 		}
-		
 	}
+	ui.moverList->setRowCount(moverCount);
+
 }
 
 CLandscape* CMainFrame::GetCurrentInfoLand()

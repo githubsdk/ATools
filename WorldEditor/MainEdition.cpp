@@ -635,6 +635,27 @@ void CMainFrame::SetSelectFoundObject(int row, int column){
 	}
 }
 
+void CMainFrame::SetSelectObject(int row, int column){
+	QTableWidgetItem * item = ui.moverList->item(row, 2);
+	CObject * obj = m_world->GetObject(item->text().toInt());
+	if (obj != null){
+		CWorld::s_selection.RemoveAll();
+		CWorld::s_selection.Append(obj);
+		m_editor->RenderEnvironment();
+	}
+}
+
+void CMainFrame::ViewSelectObject(int row, int column){
+	QTableWidgetItem * item = ui.moverList->item(row, 2);
+	CObject * obj = m_world->GetObject(item->text().toInt());
+	if (obj != null){
+		//MoveCameraToPosition(obj->m_pos.x, obj->m_pos.z);
+		CWorld::s_selection.RemoveAll();
+		CWorld::s_selection.Append(obj);
+		m_editor->RenderEnvironment();
+	}
+}
+
 void CMainFrame::RemovePath()
 {
 	if (!m_world)

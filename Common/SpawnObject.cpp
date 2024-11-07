@@ -8,6 +8,7 @@
 #include "SpawnObject.h"
 #include "TextFile.h"
 #include "Ctrl.h"
+#include "Project.h"
 
 CSpawnObject::CSpawnObject()
 	: m_isRespawn(false),
@@ -121,7 +122,7 @@ void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray, int id)
 
 	QJsonObject respawn;
 
-	respawn.insert("id", id);
+	respawn.insert("editorId", id);
 	
 	respawn.insert("type", (int)m_type);
 	respawn.insert("modelID", (int)m_modelID);
@@ -156,9 +157,26 @@ void CSpawnObject::WriteRespawnJson(QJsonArray& jsonArray, int id)
 	respawn.insert("itemMin", m_itemMin);
 	respawn.insert("itemMax", m_itemMax);
 	respawn.insert("aiState", m_aiState);
-	respawn.insert("rotY", m_rot.y);
+	QJsonObject rot;
+	rot.insert("x", m_rot.x);
+	rot.insert("y", 180 - m_rot.y);
+	rot.insert("z", -m_rot.z);
+	respawn.insert("rot", rot);
+
 	respawn.insert("patrolIndex", m_patrolIndex);
 	respawn.insert("patrolCycle", m_patrolCycle);
+	respawn.insert("name", GetRenderName());
+	respawn.insert("nameID", GetRenderNameID());
+	respawn.insert("respawn", IsRespawn());
+	MoverProp * mp = Project->GetMoverProp(m_modelID);
+	if (mp != null){
+		respawn.insert("belligerence",(int) mp->belligerence);
+	}
+	else{
+		int a = 1;
+	}
+
+	///参考 const bool peaceful = ((CMover*)obj)->IsPeaceful(); 的使用方式，认为peaceful的是npc，否则是怪
 	if (m_type == OT_CTRL)
 	{
 		CCtrl* ctrl = (CCtrl*)this;

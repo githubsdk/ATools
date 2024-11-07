@@ -29,6 +29,7 @@ public:
 	virtual bool Init();
 	virtual void RenderName();
 	virtual string GetRenderName();
+	virtual string GetRenderNameID();
 
 	virtual DWORD GetRectColor() {
 		return 0xffff0000;

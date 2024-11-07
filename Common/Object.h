@@ -92,6 +92,7 @@ public:
 	}
 
 	virtual string GetRenderName(){ return GetModelFilename(); }
+	virtual string GetRenderNameID(){ return GetModelFilename(); };
 
 protected:
 	ulong m_ID;
